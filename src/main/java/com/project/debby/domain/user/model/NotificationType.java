@@ -1,0 +1,16 @@
+package com.project.debby.domain.user.model;
+
+public enum NotificationType {
+    NEW_LOAN,
+    LOAN_ACCEPTED,
+    LOAN_DECLINED,
+    TERMS_CHANGE_REQUEST,
+    TERMS_CHANGE_ACCEPTED,
+    TERMS_CHANGE_DECLINED,
+    PAID_PART_REQUEST,
+    PAID_PART_ACCEPTED,
+    PAID_PART_DECLINED,
+    CLOSE_REQUEST,
+    CLOSE_ACCEPTED,
+    CLOSE_DECLINED
+}
