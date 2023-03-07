@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 @Service
 public class MailServiceImpl implements MailService {
 
-    @Value("${MAIL_USERNAME}")
+    @Value("${mail.username}")
     private String username;
     private final JavaMailSender mailSender;
     private final ExecutorService mailThreadPool = Executors.newFixedThreadPool(18);

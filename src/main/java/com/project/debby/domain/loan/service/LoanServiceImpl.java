@@ -1,8 +1,12 @@
 package com.project.debby.domain.loan.service;
 
+import com.project.debby.domain.integrations.minio.client.exception.CannotRemoveObjectMinioException;
+import com.project.debby.domain.integrations.minio.service.MinioService;
 import com.project.debby.domain.loan.dto.request.LoanChangeTermsDTO;
 import com.project.debby.domain.loan.dto.request.LoanPaidPartConfirmationDTO;
 import com.project.debby.domain.loan.dto.request.LoanRegisterDTO;
+import com.project.debby.domain.loan.dto.response.LoanDTO;
+import com.project.debby.domain.loan.dto.response.LoanStateDTO;
 import com.project.debby.domain.loan.model.Loan;
 import com.project.debby.domain.loan.model.LoanState;
 import com.project.debby.domain.loan.model.LoanStatus;
@@ -19,9 +23,11 @@ import com.project.debby.util.exceptions.RequestedEntityNotFound;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -34,6 +40,8 @@ public class LoanServiceImpl implements LoanService {
     private final LoanStateFactory loanStateFactory;
     private final LoanStateRepository loanStateRepository;
     private final NotificationService notificationService;
+
+    private final MinioService minioService;
 
     @Override
     public Loan createLoan(LoanRegisterDTO registerDTO, String userID) throws RequestedEntityNotFound {
@@ -201,6 +209,32 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public List<LoanState> getStatusesOfAllLoans(String userID) {
         return loanStateRepository.getAllByBorrower_UserDetails_Credentials_ExternalId(userID);
+    }
+
+    @Override
+    public String uploadImage(String userId, MultipartFile file, Long stateId) throws RequestedEntityNotFound, NotEnoughPermissionsException, CannotRemoveObjectMinioException {
+        User user = userService.getUser(userId);
+        LoanState state = getLoanState(stateId, userId);
+        if(state.getBorrower().getId().equals(user.getId())){
+            if(state.getFile() != null){
+                minioService.removeImage(state);
+            }
+            state.setFile(minioService.saveImage(state, file));
+            loanStateRepository.saveAndFlush(state);
+            return minioService.getImageURL(state);
+        }else throw new NotEnoughPermissionsException();
+    }
+
+    @Override
+    public LoanDTO convertToDTO(Loan loan) {
+        var loanDTO = LoanDTO.create(loan);
+        var statesDTO = loan.getStates().stream().map(v -> {
+            var dto = LoanStateDTO.create(v);
+            dto.setFile(minioService.getImageURL(v));
+            return dto;
+        }).collect(Collectors.toList());
+        loanDTO.setStates(statesDTO);
+        return loanDTO;
     }
 
     public LoanState getLoanState(Long id, String userID) throws RequestedEntityNotFound {

@@ -4,7 +4,7 @@ public class MinioConstants {
 
     private MinioConstants(){}
 
-    public static String PROFILE_AVATAR_BUCKET_NAME = "profile-avatars";
+    public static String PROFILE_AVATAR_BUCKET_NAME = "debby-backet";
 
 
 }

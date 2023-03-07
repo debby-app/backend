@@ -9,13 +9,11 @@ import lombok.Data;
 public class TokenDTO {
     private String accessToken;
     private String refreshToken;
-    private String userID;
 
-    public static TokenDTO create(Token token, String userID){
+    public static TokenDTO create(Token token){
         return TokenDTO.builder()
                 .accessToken(token.getAccessToken())
                 .refreshToken(token.getRefreshToken())
-                .userID(userID)
                 .build();
     }
 }

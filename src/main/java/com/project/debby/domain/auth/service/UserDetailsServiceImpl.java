@@ -9,12 +9,16 @@ import com.project.debby.domain.auth.model.repository.UserDetailsRepository;
 import com.project.debby.domain.auth.service.exceptions.PasswordDoNotMatchesException;
 import com.project.debby.domain.user.dto.request.ChangeEmailDTO;
 import com.project.debby.domain.user.dto.request.PasswordUpdateDTO;
+import com.project.debby.domain.user.model.User;
+import com.project.debby.domain.user.service.exception.UserAlreadyExistException;
 import com.project.debby.util.exceptions.RequestedEntityNotFound;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -37,7 +41,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public void changeEmail(ChangeEmailDTO updateDTO, String UserID) throws RequestedEntityNotFound {
+    public void changeEmail(ChangeEmailDTO updateDTO, String UserID) throws RequestedEntityNotFound,
+            UserAlreadyExistException {
+        Optional<UserDetails> checkUser = userDetailsRepository.findByCredentials_Email(updateDTO.getNewEmail());
+        if (checkUser.isPresent()) throw new UserAlreadyExistException();
         log.info("--updating email | user extId {}", UserID);
         UserDetails userDetails = getByExternalID(UserID);
         userDetails.getCredentials().setEmail(updateDTO.getNewEmail());
@@ -58,15 +65,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("--signing in | user email {}", loginDTO.getEmail());
         UserDetails user = userDetailsRepository.findByCredentials_Email(loginDTO.getEmail())
                 .orElseThrow(RequestedEntityNotFound::new);
+        log.info("--checking user| user email {}", loginDTO.getEmail());
         if (!user.isEnabled()){
             throw new UserDisabledException("User with email extracted from token is currently disabled.");
         }
-        if (user.isAccountNonExpired()){
+        if (!user.isAccountNonExpired()){
             throw new UserExpiredException("User with email extracted from token is currently expired.");
         }
-        if (user.isAccountNonLocked()){
+        if (!user.isAccountNonLocked()){
             throw new UserLockedException("User with email extracted from token is currently locked.");
         }
+        log.info("--checking password | user email {}", loginDTO.getEmail());
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getCredentials().getPassword())){
             throw new PasswordDoNotMatchesException();
         }

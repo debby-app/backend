@@ -64,8 +64,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .authorizeRequests()
-                .antMatchers("/user/sign-in", "/user/sign-up", "/user/confirm/*").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/api.html", "/swagger-ui/*", "/v3/api-docs", "/user/sign-in", "/user/sign-up", "/user/confirm/*").permitAll()
+                .anyRequest().permitAll();
     }
 
     @Bean

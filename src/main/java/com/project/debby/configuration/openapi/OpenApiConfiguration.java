@@ -24,7 +24,7 @@ public class OpenApiConfiguration {
                                 .url("http://localhost/"))
                         .contact(new Contact().name("Daniil \"Seekerses\" Popov")
                                 .email("seekergodlike@gmail.com")))
-                .servers(List.of(new Server().url("http://localhost:8082")
+                .servers(List.of(new Server().url("http://87.239.105.85:8080")
                         .description("Main server")));
     }
 }

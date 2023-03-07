@@ -2,10 +2,7 @@ package com.project.debby.domain.integrations.minio.client;
 
 import com.project.debby.domain.integrations.minio.client.dto.GetFileURLMinioDTO;
 import com.project.debby.domain.integrations.minio.client.dto.UploadFileMinioDTO;
-import com.project.debby.domain.integrations.minio.client.exception.CannotCheckBucketInMinioException;
-import com.project.debby.domain.integrations.minio.client.exception.CannotCreateBucketInMinioException;
-import com.project.debby.domain.integrations.minio.client.exception.CannotGetFileURLFromMinioException;
-import com.project.debby.domain.integrations.minio.client.exception.CannotUploadFileToMinioException;
+import com.project.debby.domain.integrations.minio.client.exception.*;
 
 /**
  * Данный клиент представляет низкоуровневое апи для общение с минио сервисом
@@ -25,6 +22,8 @@ public interface MinioClientEx {
      *                 для сохранения файла (бакет, путь, имя, сам файл)
      */
     void saveFile(UploadFileMinioDTO minioDTO) throws CannotUploadFileToMinioException;
+
+    void deleteFile(GetFileURLMinioDTO minioDTO) throws CannotRemoveObjectMinioException;
 
     /**
      * Метод для создание нового бакета в minio

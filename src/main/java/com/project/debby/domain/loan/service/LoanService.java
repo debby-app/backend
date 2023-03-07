@@ -1,12 +1,15 @@
 package com.project.debby.domain.loan.service;
 
+import com.project.debby.domain.integrations.minio.client.exception.CannotRemoveObjectMinioException;
 import com.project.debby.domain.loan.dto.request.LoanChangeTermsDTO;
 import com.project.debby.domain.loan.dto.request.LoanPaidPartConfirmationDTO;
 import com.project.debby.domain.loan.dto.request.LoanRegisterDTO;
+import com.project.debby.domain.loan.dto.response.LoanDTO;
 import com.project.debby.domain.loan.model.Loan;
 import com.project.debby.domain.loan.model.LoanState;
 import com.project.debby.util.exceptions.NotEnoughPermissionsException;
 import com.project.debby.util.exceptions.RequestedEntityNotFound;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,4 +29,7 @@ public interface LoanService {
     Loan getLoan(Long id, String userID) throws RequestedEntityNotFound;
     List<Loan> getAllLoans(String userID);
     List<LoanState> getStatusesOfAllLoans(String userID);
+
+    String uploadImage(String userId, MultipartFile file, Long stateId) throws RequestedEntityNotFound, NotEnoughPermissionsException, CannotRemoveObjectMinioException;
+    LoanDTO convertToDTO(Loan loan);
 }

@@ -2,10 +2,7 @@ package com.project.debby.domain.integrations.minio.client;
 
 import com.project.debby.domain.integrations.minio.client.dto.GetFileURLMinioDTO;
 import com.project.debby.domain.integrations.minio.client.dto.UploadFileMinioDTO;
-import com.project.debby.domain.integrations.minio.client.exception.CannotCheckBucketInMinioException;
-import com.project.debby.domain.integrations.minio.client.exception.CannotCreateBucketInMinioException;
-import com.project.debby.domain.integrations.minio.client.exception.CannotGetFileURLFromMinioException;
-import com.project.debby.domain.integrations.minio.client.exception.CannotUploadFileToMinioException;
+import com.project.debby.domain.integrations.minio.client.exception.*;
 import io.minio.*;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +45,20 @@ public class MinioClientExImpl implements MinioClientEx {
             minioClient.putObject(uploadObjectRequest);
         } catch (Exception e) {
             throw new CannotUploadFileToMinioException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteFile(GetFileURLMinioDTO minioDTO) throws CannotRemoveObjectMinioException {
+        var removeObjectRequest = RemoveObjectArgs
+                .builder()
+                .bucket(minioDTO.getBucketName())
+                .object(minioDTO.getFileName())
+                .build();
+        try {
+            minioClient.removeObject(removeObjectRequest);
+        } catch (Exception e) {
+            throw new CannotRemoveObjectMinioException(e.getMessage());
         }
     }
 

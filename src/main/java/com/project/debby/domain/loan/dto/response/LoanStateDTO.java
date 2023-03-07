@@ -19,6 +19,7 @@ public class LoanStateDTO {
     private LocalDateTime requestedMaturityDate;
     private BigDecimal paidPart;
     private BigDecimal paidPartOnConfirmation;
+    private String file;
 
     public static LoanStateDTO create(LoanState state){
         return LoanStateDTO.builder()

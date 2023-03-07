@@ -8,10 +8,7 @@ import com.project.debby.domain.auth.service.ConfirmationService;
 import com.project.debby.domain.auth.service.TokenService;
 import com.project.debby.domain.auth.service.UserDetailsService;
 import com.project.debby.domain.integrations.minio.service.MinioService;
-import com.project.debby.domain.user.dto.request.ChangeEmailDTO;
-import com.project.debby.domain.user.dto.request.PasswordUpdateDTO;
-import com.project.debby.domain.user.dto.request.UserRegisterDTO;
-import com.project.debby.domain.user.dto.request.UsernameUpdateDTO;
+import com.project.debby.domain.user.dto.request.*;
 import com.project.debby.domain.user.dto.response.NotificationDTO;
 import com.project.debby.domain.user.dto.response.UserWithAvatarDTO;
 import com.project.debby.domain.user.model.Notification;
@@ -57,7 +54,7 @@ public class  UserController {
 
     @SneakyThrows
     @PutMapping("/avatar")
-    ResponseEntity<UserWithAvatarDTO> updateAvatar(@RequestBody MultipartFile avatarFile,
+    ResponseEntity<UserWithAvatarDTO> updateAvatar(@RequestParam("file") MultipartFile avatarFile,
                                                           HttpServletRequest request) {
         String externalID = ExternalIdExtractor.getExternalID(request);
         log.info("Started: update avatar | user extID {}", externalID);
@@ -86,7 +83,7 @@ public class  UserController {
         log.info("Started: generating tokens | user extId {}", userDetails.getCredentials().getExternalId());
         Token token = tokenService.createToken(userDetails);
         log.info("Complete: generating tokens | user extId {}", userDetails.getCredentials().getExternalId());
-        return ResponseEntity.ok(TokenDTO.create(token, userDetails.getUsername()));
+        return ResponseEntity.ok(TokenDTO.create(token));
     }
 
     @SneakyThrows
@@ -94,12 +91,12 @@ public class  UserController {
     public ResponseEntity<TokenDTO> signIn(@RequestBody LoginDTO loginDTO){
         log.info("Started: sign-in | user email {}", loginDTO.getEmail());
         UserDetails userDetails = userDetailsService.signIn(loginDTO);
-        log.info("Started: sign-in | user email {}", loginDTO.getEmail());
+        log.info("Complete: sign-in | user email {}", loginDTO.getEmail());
 
         log.info("Started: generating tokens | user extId {}", userDetails.getCredentials().getExternalId());
         Token token = tokenService.createToken(userDetails);
         log.info("Complete: generating tokens | user extId {}", userDetails.getCredentials().getExternalId());
-        return ResponseEntity.ok(TokenDTO.create(token, userDetails.getUsername()));
+        return ResponseEntity.ok(TokenDTO.create(token));
     }
 
     @SneakyThrows
@@ -112,6 +109,15 @@ public class  UserController {
     }
 
     @SneakyThrows
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenDTO> refreshToken(@RequestBody String refreshToken){
+        log.info("Started: refreshing tokens");
+        Token token = tokenService.refreshToken(refreshToken);
+        log.info("Complete: refreshing tokens");
+        return ResponseEntity.ok(TokenDTO.create(token));
+    }
+
+    @SneakyThrows
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody String refreshToken, HttpServletRequest request){
         log.info("Started: logout | user extId {} ", ExternalIdExtractor.getExternalID(request));
@@ -121,7 +127,7 @@ public class  UserController {
     }
 
     @SneakyThrows
-    @GetMapping("/get/{externalId}")
+    @GetMapping("/get/by-id/{externalId}")
     public ResponseEntity<UserWithAvatarDTO> getUser(@PathVariable String externalId){
         log.info("Started: select user | user extId {} ", externalId);
         User user = userService.getUser(externalId);
@@ -145,5 +151,40 @@ public class  UserController {
         String externalID = ExternalIdExtractor.getExternalID(request);
         List<Notification> notifications = notificationService.getAllNotifications(externalID);
         return ResponseEntity.ok(notifications.stream().map(NotificationDTO::create).collect(Collectors.toList()));
+    }
+
+    @SneakyThrows
+    @GetMapping("/me")
+    public ResponseEntity<UserWithAvatarDTO> getMe(HttpServletRequest request){
+        String externalID = ExternalIdExtractor.getExternalID(request);
+        User user = userService.getUser(externalID);
+        return ResponseEntity.ok(UserWithAvatarDTO.create(user, minioService.getAvatarURL(user)));
+    }
+
+    @SneakyThrows
+    @GetMapping("/get/by-email")
+    public ResponseEntity<UserWithAvatarDTO> getByEmail(@RequestParam String email){
+        log.info("Started: selecting by email {}", email);
+        User user = userService.getByEmail(email);
+        return ResponseEntity.ok(UserWithAvatarDTO.create(user, minioService.getAvatarURL(user)));
+    }
+
+    @SneakyThrows
+    @GetMapping("/get/by-username")
+    public ResponseEntity<List<UserWithAvatarDTO>> getByUsername(@RequestParam String username){
+        log.info("Started: selecting by username {}", username);
+        List<User> users = userService.getByUsername(username);
+        return ResponseEntity.ok(users.stream()
+                .map((v) -> UserWithAvatarDTO.create(v, minioService.getAvatarURL(v)))
+                .collect(Collectors.toList()));
+    }
+
+    @SneakyThrows
+    @PostMapping("/user-id")
+    public ResponseEntity<TokenDTO> updateUserID(@RequestBody UpdateExternalID updateDTO, HttpServletRequest request){
+        String externalID = ExternalIdExtractor.getExternalID(request);
+        User user = userService.updateExternalID(updateDTO, externalID);
+        Token token = tokenService.createToken(user.getUserDetails());
+        return ResponseEntity.ok(TokenDTO.create(token));
     }
 }

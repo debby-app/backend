@@ -7,4 +7,6 @@ import com.project.debby.util.exceptions.RequestedEntityNotFound;
 public interface TokenService {
     Token createToken(UserDetails userDetails);
     void deleteToken(String refreshToken) throws RequestedEntityNotFound;
+
+    Token refreshToken(String refreshToken) throws RequestedEntityNotFound;
 }

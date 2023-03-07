@@ -1,6 +1,6 @@
 package com.project.debby.domain.integrations.minio.client.dto;
 
-import com.project.debby.domain.integrations.minio.model.entity.ProfileAvatar;
+import com.project.debby.domain.integrations.minio.model.entity.File;
 import lombok.Data;
 
 @Data
@@ -18,7 +18,7 @@ public class GetFileURLMinioDTO {
         this.fileName = fileName;
     }
 
-    public static GetFileURLMinioDTO create(ProfileAvatar avatar) {
+    public static GetFileURLMinioDTO create(File avatar) {
         return new GetFileURLMinioDTO(
                 avatar.getBucket(),
                 avatar.getFilePath(),

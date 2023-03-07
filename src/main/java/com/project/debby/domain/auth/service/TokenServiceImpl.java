@@ -39,4 +39,17 @@ public class TokenServiceImpl implements TokenService {
         tokenRepository.deleteFromAssociation(token.getId());
         tokenRepository.delete(token);
     }
+
+    @Override
+    public Token refreshToken(String refreshToken) throws RequestedEntityNotFound {
+        Token token = tokenRepository.getTokenByRefreshToken(refreshToken)
+                .orElseThrow(RequestedEntityNotFound::new);
+        String userID = jwtService.extractUserIdFromToken(refreshToken);
+        UserDetails userDetails = userDetailsRepository.findByCredentials_ExternalId(userID)
+                .orElseThrow(RequestedEntityNotFound::new);
+        Token newToken = createToken(userDetails);
+        token.setRefreshToken(newToken.getRefreshToken());
+        token.setAccessToken(newToken.getAccessToken());
+        return tokenRepository.saveAndFlush(token);
+    }
 }

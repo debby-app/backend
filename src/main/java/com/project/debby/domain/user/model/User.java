@@ -1,7 +1,7 @@
 package com.project.debby.domain.user.model;
 
 import com.project.debby.domain.auth.model.UserDetails;
-import com.project.debby.domain.integrations.minio.model.entity.ProfileAvatar;
+import com.project.debby.domain.integrations.minio.model.entity.File;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -28,7 +28,7 @@ public class User {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private UserSettings settings;
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private ProfileAvatar avatar;
+    private File avatar;
 
     @Override
     public boolean equals(Object o) {

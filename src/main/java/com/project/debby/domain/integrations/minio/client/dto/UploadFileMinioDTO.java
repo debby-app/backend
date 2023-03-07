@@ -1,6 +1,6 @@
 package com.project.debby.domain.integrations.minio.client.dto;
 
-import com.project.debby.domain.integrations.minio.model.entity.ProfileAvatar;
+import com.project.debby.domain.integrations.minio.model.entity.File;
 import lombok.Data;
 
 import java.io.InputStream;
@@ -25,13 +25,13 @@ public class UploadFileMinioDTO {
         this.file = file;
     }
 
-    public static UploadFileMinioDTO create(ProfileAvatar profileAvatar,
+    public static UploadFileMinioDTO create(File file,
                                             InputStream inputStream,
                                             String mimeType){
         return new UploadFileMinioDTO(
-                profileAvatar.getBucket(),
-                profileAvatar.getFilePath(),
-                profileAvatar.getMinioFileName(),
+                file.getBucket(),
+                file.getFilePath(),
+                file.getMinioFileName(),
                 mimeType,
                 inputStream
         );

@@ -4,9 +4,9 @@ spring:
       FAIL_ON_EMPTY_BEANS: false
     default-property-inclusion: non_null
   datasource:
-    url: jdbc:postgresql://${POSTGRES_NAME}:${PSQL_PORT}/${PSQL_NAME}
-    username: ${PSQL_USER}
-    password: ${PSQL_PASSWORD}
+    url: jdbc:postgresql://10.0.0.23/debby-postgres
+    username: debby
+    password: debby-postgres-1
     driver-class-name: org.postgresql.Driver
   jpa:
     generate-ddl: true
@@ -17,18 +17,24 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 server:
-  port: ${SERVER_PORT}
+  port: 8080
+  base-url: http://87.239.105.85:8080/
 
 springdoc:
   swagger-ui:
     path: /api.html
 
 jwt:
-  secret-word: ${JWT_SECRET}
-  refresh-token-lifetime: ${REFRESH_TOKEN_LIFE_TIME}
-  access-token-lifetime:  ${ACCESS_TOKEN_LIFE_TIME}
+  secret-word: "WHAT_IF_ITS_JUST_A_DREAM"
+  refresh-token-lifetime: 86400000
+  access-token-lifetime:  3600000
 
 minio:
-  url: http://${MINIO_NAME}:${MINIO_CONSOLE_PORT}
-  access-key: ${MINIO_ACCESS_KEY}
-  secret-key: ${MINIO_SECRET_KEY}
+  url: https://hb.bizmrg.com
+  access-key: tarGkfTHsTucwt1YNN5nAT
+  secret-key: fkzqiTK772Mw43QLNGpND7WKCd1Dq6pbvQ8dWtwDEDUv
+
+mail:
+  username: no-reply@plofin.com
+  password: q99mrvNi0EQFa4iza2tD
+  confirmation_hash_lifetime: 3600000

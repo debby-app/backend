@@ -18,10 +18,10 @@ import java.util.HashMap;
 @Service
 public class ConfirmationServiceImpl implements ConfirmationService {
 
-    @Value("${SERVER_BASE_URL}")
+    @Value("${server.base-url}")
     private String baseURL;
 
-    @Value("${CONFIRMATION_HASH_LIFETIME}")
+    @Value("${mail.confirmation_hash_lifetime}")
     private int confirmationLifetime;
 
     private final UserDetailsService userDetailsService;
@@ -33,7 +33,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         ConfirmationMail link = createConfirmationMail(userID);
         String subject = "Confirmation Link";
         String text = "To verify this email and activate your account" +
-                " please follow this confirmation link " + "http://" + baseURL + ":8082/user/confirm/"
+                " please follow this confirmation link " + baseURL + "user/confirm/"
                 + link.getHash();
         log.info("--sending confirmation mail | user extId {}", userID);
         mailService.sendMail(email, subject, text);
