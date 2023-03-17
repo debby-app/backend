@@ -27,8 +27,8 @@ public interface LoanService {
     void acceptClose(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void declineClose(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     Loan getLoan(Long id, String userID) throws RequestedEntityNotFound;
-    List<Loan> getAllLoans(String userID);
-    List<LoanState> getStatusesOfAllLoans(String userID);
+    List<Loan> getAllOwnedLoans(String userID, boolean archived);
+    List<LoanState> getAllDebts(String userID, boolean archived);
 
     String uploadImage(String userId, MultipartFile file, Long stateId) throws RequestedEntityNotFound, NotEnoughPermissionsException, CannotRemoveObjectMinioException;
     LoanDTO convertToDTO(Loan loan);

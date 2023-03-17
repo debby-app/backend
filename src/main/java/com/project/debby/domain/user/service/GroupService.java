@@ -16,4 +16,5 @@ public interface GroupService {
 
     void deleteMemberFromGroup(String ownerId, String groupName, String idToDelete) throws RequestedEntityNotFound;
     void updateGroupName(String ownerId, String oldName, UpdateGroupNameDTO groupNameDTO) throws RequestedEntityNotFound;
+    void deleteGroup(String ownerId, String groupName) throws RequestedEntityNotFound;
 }

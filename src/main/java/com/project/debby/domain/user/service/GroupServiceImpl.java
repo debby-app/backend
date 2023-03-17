@@ -69,4 +69,10 @@ public class GroupServiceImpl implements GroupService {
         group.setName(groupNameDTO.getNewName());
         groupRepository.saveAndFlush(group);
     }
+
+    @Override
+    public void deleteGroup(String ownerId, String groupName) throws RequestedEntityNotFound {
+        Group group = getGroup(groupName, ownerId);
+        groupRepository.delete(group);
+    }
 }

@@ -28,13 +28,19 @@ public class GroupController {
     @GetMapping("/{name}")
     public ResponseEntity<GroupDTO> getGroup(@PathVariable String id, @PathVariable String name, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
-        return ResponseEntity.ok(GroupDTO.create(groupService.getGroup(name, externalId)));
+        log.info("Started: get group | owner extID {} group name  {}", externalId, name);
+        Group group = groupService.getGroup(name, externalId);
+        log.info("Complete: get group | owner extID {} group name  {}", externalId, name);
+        return ResponseEntity.ok(GroupDTO.create(group));
     }
 
     @SneakyThrows
     @GetMapping("/")
     public ResponseEntity<List<GroupDTO>> getGroups(@PathVariable String id,  HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        log.info("Started: get all groups | owner extID {}", externalId);
+        List<Group> groups = groupService.getAllGroups(externalId);
+        log.info("Started: get all groups | owner extID {}", externalId);
         return ResponseEntity.ok(groupService.getAllGroups(externalId).stream()
                 .map(GroupDTO::create).collect(Collectors.toList()));
     }
@@ -44,7 +50,9 @@ public class GroupController {
     public ResponseEntity<GroupDTO> createGroup(@PathVariable String id, @RequestBody GroupRegisterDTO registerDTO,
                                                 HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        log.info("Started: create group | owner extID {} group name  {}", externalId, registerDTO.getName());
         Group group = groupService.createGroup(registerDTO, externalId);
+        log.info("Complete: create group | owner extID {} group name  {}", externalId, registerDTO.getName());
         return ResponseEntity.ok(GroupDTO.create(group));
     }
 
@@ -54,7 +62,9 @@ public class GroupController {
                                                  @PathVariable String idToAdd,
                                                 HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        log.info("Started: add member to group | owner extID {} group name  {} member {}", externalId, name, idToAdd);
         groupService.addToGroup(externalId, name, idToAdd);
+        log.info("Complete: add member to group | owner extID {} group name  {} member {}", externalId, name, idToAdd);
         return ResponseEntity.ok().build();
     }
 
@@ -64,7 +74,9 @@ public class GroupController {
                                                       @PathVariable String idToDelete,
                                                 HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        log.info("Started: delete member from group | owner extID {} group name  {} member {}", externalId, name, idToDelete);
         groupService.deleteMemberFromGroup(externalId, name, idToDelete);
+        log.info("Complete: delete member from group | owner extID {} group name  {} member {}", externalId, name, idToDelete);
         return ResponseEntity.ok().build();
     }
 
@@ -74,7 +86,20 @@ public class GroupController {
                                                 @RequestBody UpdateGroupNameDTO updateGroupNameDTO,
                                                 HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        log.info("Started: update group name | owner extID {} group name  {}", externalId, name);
         groupService.updateGroupName(externalId, name, updateGroupNameDTO);
+        log.info("Complete: update group name | owner extID {} group name  {}", externalId, name);
+        return ResponseEntity.ok().build();
+    }
+
+    @SneakyThrows
+    @DeleteMapping("/{name}")
+    public ResponseEntity<Void> deleteGroup(@PathVariable String id, @PathVariable String name,
+                                            HttpServletRequest request){
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        log.info("Started: delete group | owner extID {} group name  {}", externalId, name);
+        groupService.deleteGroup(externalId, name);
+        log.info("Complete: update group name | owner extID {} group name  {}", externalId, name);
         return ResponseEntity.ok().build();
     }
 }

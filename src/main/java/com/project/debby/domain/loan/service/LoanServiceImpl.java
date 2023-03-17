@@ -226,13 +226,15 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public List<Loan> getAllLoans(String userID) {
-        return loanRepository.getAllByOwner_UserDetails_Credentials_ExternalId(userID);
+    public List<Loan> getAllOwnedLoans(String userID, boolean archived) {
+        if(archived) return loanRepository.getAllLoans(userID);
+        else return loanRepository.getAllActiveLoans(userID);
     }
 
     @Override
-    public List<LoanState> getStatusesOfAllLoans(String userID) {
-        return loanStateRepository.getAllByBorrower_UserDetails_Credentials_ExternalId(userID);
+    public List<LoanState> getAllDebts(String userID, boolean archived) {
+        if (archived) return loanStateRepository.getAllDebts(userID);
+        else return loanStateRepository.getAllActiveDebts(userID);
     }
 
     @Override
