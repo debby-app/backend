@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
@@ -65,7 +66,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .antMatchers("/api.html", "/swagger-ui/*", "/v3/api-docs", "/user/sign-in", "/user/sign-up", "/user/confirm/*").permitAll()
-                .anyRequest().permitAll();
+                .antMatchers(HttpMethod.PUT, "/users/").hasAuthority("ADMIN")
+                .anyRequest().authenticated();
     }
 
     @Bean

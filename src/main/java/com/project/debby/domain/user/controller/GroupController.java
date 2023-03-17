@@ -1,7 +1,5 @@
 package com.project.debby.domain.user.controller;
 
-import com.project.debby.domain.user.dto.request.AddMemberToGroupDTO;
-import com.project.debby.domain.user.dto.request.DeleteMemberFromGroupDTO;
 import com.project.debby.domain.user.dto.request.GroupRegisterDTO;
 import com.project.debby.domain.user.dto.request.UpdateGroupNameDTO;
 import com.project.debby.domain.user.dto.response.GroupDTO;
@@ -21,58 +19,62 @@ import java.util.stream.Collectors;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/group")
+@RequestMapping("{id}/groups")
 public class GroupController {
 
     private final GroupService groupService;
 
     @SneakyThrows
-    @GetMapping("/group")
-    public ResponseEntity<GroupDTO> getGroup(@RequestParam String name, HttpServletRequest request){
-        String externalId = ExternalIdExtractor.getExternalID(request);
+    @GetMapping("/{name}")
+    public ResponseEntity<GroupDTO> getGroup(@PathVariable String id, @PathVariable String name, HttpServletRequest request){
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
         return ResponseEntity.ok(GroupDTO.create(groupService.getGroup(name, externalId)));
     }
 
     @SneakyThrows
-    @GetMapping("/groups")
-    public ResponseEntity<List<GroupDTO>> getGroup(HttpServletRequest request){
-        String externalId = ExternalIdExtractor.getExternalID(request);
+    @GetMapping("/")
+    public ResponseEntity<List<GroupDTO>> getGroups(@PathVariable String id,  HttpServletRequest request){
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
         return ResponseEntity.ok(groupService.getAllGroups(externalId).stream()
                 .map(GroupDTO::create).collect(Collectors.toList()));
     }
 
     @SneakyThrows
-    @PostMapping("/group")
-    public ResponseEntity<GroupDTO> createGroup(@RequestBody GroupRegisterDTO registerDTO, HttpServletRequest request){
-        String externalId = ExternalIdExtractor.getExternalID(request);
+    @PostMapping("/")
+    public ResponseEntity<GroupDTO> createGroup(@PathVariable String id, @RequestBody GroupRegisterDTO registerDTO,
+                                                HttpServletRequest request){
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
         Group group = groupService.createGroup(registerDTO, externalId);
         return ResponseEntity.ok(GroupDTO.create(group));
     }
 
     @SneakyThrows
-    @PostMapping("/group/add")
-    public ResponseEntity<Void> addMemberToGroup(@RequestBody AddMemberToGroupDTO addMemberToGroupDTO,
+    @PostMapping("/{name}/{idToAdd}")
+    public ResponseEntity<Void> addMemberToGroup(@PathVariable String id, @PathVariable String name,
+                                                 @PathVariable String idToAdd,
                                                 HttpServletRequest request){
-        String externalId = ExternalIdExtractor.getExternalID(request);
-        groupService.addToGroup(addMemberToGroupDTO, externalId);
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        groupService.addToGroup(externalId, name, idToAdd);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/group/delete")
-    public ResponseEntity<Void> deleteMemberFromGroup(@RequestBody DeleteMemberFromGroupDTO deleteMemberFromGroupDTO,
+    @DeleteMapping("/{name}/{idToDelete}")
+    public ResponseEntity<Void> deleteMemberFromGroup(@PathVariable String id, @PathVariable String name,
+                                                      @PathVariable String idToDelete,
                                                 HttpServletRequest request){
-        String externalId = ExternalIdExtractor.getExternalID(request);
-        groupService.deleteMemberFromGroup(deleteMemberFromGroupDTO, externalId);
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        groupService.deleteMemberFromGroup(externalId, name, idToDelete);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/group/name")
-    public ResponseEntity<Void> updateGroupName(@RequestBody UpdateGroupNameDTO updateGroupNameDTO,
+    @PutMapping("/{name}")
+    public ResponseEntity<Void> updateGroupName(@PathVariable String id, @PathVariable String name,
+                                                @RequestBody UpdateGroupNameDTO updateGroupNameDTO,
                                                 HttpServletRequest request){
-        String externalId = ExternalIdExtractor.getExternalID(request);
-        groupService.updateGroupName(updateGroupNameDTO, externalId);
+        String externalId = ExternalIdExtractor.getExternalIDSafely(id, request);
+        groupService.updateGroupName(externalId, name, updateGroupNameDTO);
         return ResponseEntity.ok().build();
     }
 }

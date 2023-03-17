@@ -13,7 +13,9 @@ public interface GroupService {
     Group getGroup(String name, String userID) throws RequestedEntityNotFound;
     List<Group> getAllGroups(String userID);
     Group createGroup(GroupRegisterDTO registerDTO, String userID) throws RequestedEntityNotFound;
-    void addToGroup(AddMemberToGroupDTO addMemberDTO, String userID) throws RequestedEntityNotFound;
-    void deleteMemberFromGroup(DeleteMemberFromGroupDTO deleteDTO, String userID) throws RequestedEntityNotFound;
-    void updateGroupName(UpdateGroupNameDTO groupNameDTO, String userID) throws RequestedEntityNotFound;
+
+    void addToGroup(String ownerID, String groupName, String idToAdd) throws RequestedEntityNotFound;
+
+    void deleteMemberFromGroup(String ownerId, String groupName, String idToDelete) throws RequestedEntityNotFound;
+    void updateGroupName(String ownerId, String oldName, UpdateGroupNameDTO groupNameDTO) throws RequestedEntityNotFound;
 }

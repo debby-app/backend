@@ -6,6 +6,5 @@ import java.math.BigDecimal;
 
 @Data
 public class LoanPaidPartConfirmationDTO {
-    private Long stateID;
     private BigDecimal paidPart;
 }

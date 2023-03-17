@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/loan")
+@RequestMapping("/loans")
 public class LoanController {
 
     private final LoanService loanService;
@@ -39,105 +39,106 @@ public class LoanController {
     }
 
     @SneakyThrows
-    @PostMapping("/confirm")
-    public ResponseEntity<Void> acceptLoan(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/confirm")
+    public ResponseEntity<Void> acceptLoan(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.acceptLoan(id, externalId);
+        loanService.acceptLoan(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/decline")
-    public ResponseEntity<Void> declineLoan(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/decline")
+    public ResponseEntity<Void> declineLoan(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.declineLoan(id, externalId);
+        loanService.declineLoan(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/terms/request")
-    public ResponseEntity<Void> requestTermsChange(@RequestBody LoanChangeTermsDTO termsDTO, HttpServletRequest request){
+    @PostMapping("/{stateId}/terms/request")
+    public ResponseEntity<Void> requestTermsChange(@PathVariable Long stateId, @RequestBody LoanChangeTermsDTO termsDTO, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.requestTermsChange(termsDTO, externalId);
+        loanService.requestTermsChange(stateId, termsDTO, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/terms/accept")
-    public ResponseEntity<Void> acceptTermsChange(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/terms/accept")
+    public ResponseEntity<Void> acceptTermsChange(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.acceptChangeTerms(id, externalId);
+        loanService.acceptChangeTerms(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/terms/decline")
-    public ResponseEntity<Void> declineTermsChange(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/terms/decline")
+    public ResponseEntity<Void> declineTermsChange(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.declineChangeTerms(id, externalId);
+        loanService.declineChangeTerms(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/part/request")
-    public ResponseEntity<Void> requestPaidPartConfirmation(@RequestBody LoanPaidPartConfirmationDTO
+    @PostMapping("/{stateId}/part/request")
+    public ResponseEntity<Void> requestPaidPartConfirmation(@PathVariable Long stateId,
+                                                            @RequestBody LoanPaidPartConfirmationDTO
                                                                         paidPartConfirmationDTO,
                                                             HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.requestPaidPartConfirmation(paidPartConfirmationDTO, externalId);
+        loanService.requestPaidPartConfirmation(stateId, paidPartConfirmationDTO, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/part/accept")
-    public ResponseEntity<Void> acceptPaidPart(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/part/accept")
+    public ResponseEntity<Void> acceptPaidPart(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.acceptPaidPart(id, externalId);
+        loanService.acceptPaidPart(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/part/decline")
-    public ResponseEntity<Void> declinePaidPart(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/part/decline")
+    public ResponseEntity<Void> declinePaidPart(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.declinePaidPart(id, externalId);
+        loanService.declinePaidPart(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/close/request")
-    public ResponseEntity<Void> requestClose(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/close/request")
+    public ResponseEntity<Void> requestClose(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.requestClose(id, externalId);
+        loanService.requestClose(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/close/accept")
-    public ResponseEntity<Void> acceptClose(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/close/accept")
+    public ResponseEntity<Void> acceptClose(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.acceptClose(id, externalId);
+        loanService.acceptClose(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @PostMapping("/close/decline")
-    public ResponseEntity<Void> declineClose(@RequestParam Long id, HttpServletRequest request){
+    @PostMapping("/{stateId}/close/decline")
+    public ResponseEntity<Void> declineClose(@PathVariable Long stateId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        loanService.declineClose(id, externalId);
+        loanService.declineClose(stateId, externalId);
         return ResponseEntity.ok().build();
     }
 
     @SneakyThrows
-    @GetMapping
-    public ResponseEntity<LoanDTO> getLoan(@RequestParam Long id, HttpServletRequest request){
+    @GetMapping("/{loanId}")
+    public ResponseEntity<LoanDTO> getLoan(@PathVariable Long loanId, HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
-        Loan loan = loanService.getLoan(id, externalId);
+        Loan loan = loanService.getLoan(loanId, externalId);
         return ResponseEntity.ok(loanService.convertToDTO(loan));
     }
 
     @SneakyThrows
-    @GetMapping("/all")
+    @GetMapping("/")
     public ResponseEntity<List<LoanDTO>> getAllLoans(HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
         List<Loan> loans = loanService.getAllLoans(externalId);
@@ -146,16 +147,16 @@ public class LoanController {
 
     @SneakyThrows
     @GetMapping("/states")
-    public ResponseEntity<List<LoanDTO>> getStatesOfAllLoans(HttpServletRequest request){
+    public ResponseEntity<List<LoanDTO>> getAllStates(HttpServletRequest request){
         String externalId = ExternalIdExtractor.getExternalID(request);
         List<LoanState> states = loanService.getStatusesOfAllLoans(externalId);
         return ResponseEntity.ok(states.stream().map((v) -> loanService.convertToDTO((v.getLoan()))).collect(Collectors.toList()));
     }
 
-    @PostMapping("/states/{id}")
-    public ResponseEntity<String> uploadImage(@PathVariable("id") Long stateId, @RequestParam("file") MultipartFile file, HttpServletRequest request) throws NotEnoughPermissionsException, RequestedEntityNotFound, CannotRemoveObjectMinioException {
+    @PostMapping("/states/{id}/image")
+    public ResponseEntity<String> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file, HttpServletRequest request) throws NotEnoughPermissionsException, RequestedEntityNotFound, CannotRemoveObjectMinioException {
         String externalId = ExternalIdExtractor.getExternalID(request);
-        return ResponseEntity.ok(loanService.uploadImage(externalId, file, stateId));
+        return ResponseEntity.ok(loanService.uploadImage(externalId, file, id));
 
     }
 }

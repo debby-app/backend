@@ -82,9 +82,9 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public void requestTermsChange(LoanChangeTermsDTO changeTermsDTO, String userID) throws RequestedEntityNotFound,
+    public void requestTermsChange(Long stateId, LoanChangeTermsDTO changeTermsDTO, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
-        LoanState state = getLoanState(changeTermsDTO.getStateID(), userID);
+        LoanState state = getLoanState(stateId, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setRequestedMaturityDate(changeTermsDTO.getNewMaturityDate());
             state.setStatus(LoanStatus.CHANGED);
@@ -118,9 +118,9 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public void requestPaidPartConfirmation(LoanPaidPartConfirmationDTO confirmationDTO, String userID)
+    public void requestPaidPartConfirmation(Long stateId, LoanPaidPartConfirmationDTO confirmationDTO, String userID)
             throws RequestedEntityNotFound, NotEnoughPermissionsException {
-        LoanState state = getLoanState(confirmationDTO.getStateID(), userID);
+        LoanState state = getLoanState(stateId, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setPaidPartOnConfirmation(confirmationDTO.getPaidPart());
             state.setStatus(LoanStatus.PENDING_PAID_PART_ACCEPTANCE);

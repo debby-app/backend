@@ -1,6 +1,5 @@
 package com.project.debby.domain.user.service;
 
-import com.project.debby.domain.user.dto.request.AddMemberToGroupDTO;
 import com.project.debby.domain.user.dto.request.DeleteMemberFromGroupDTO;
 import com.project.debby.domain.user.dto.request.GroupRegisterDTO;
 import com.project.debby.domain.user.dto.request.UpdateGroupNameDTO;
@@ -46,22 +45,22 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void addToGroup(AddMemberToGroupDTO addMemberDTO, String userID) throws RequestedEntityNotFound {
-        Group group = getGroup(addMemberDTO.getGroupName(), userID);
-        group.getUsers().add(userService.getUser(addMemberDTO.getUser()));
+    public void addToGroup(String ownerID, String groupName, String idToAdd) throws RequestedEntityNotFound {
+        Group group = getGroup(groupName, ownerID);
+        group.getUsers().add(userService.getUser(idToAdd));
         groupRepository.saveAndFlush(group);
     }
 
     @Override
-    public void deleteMemberFromGroup(DeleteMemberFromGroupDTO deleteDTO, String userID) throws RequestedEntityNotFound {
-        Group group = getGroup(deleteDTO.getGroupName(), userID);
-        group.getUsers().removeIf((user) -> deleteDTO.getUser().equals(user.getUserDetails().getUsername()));
+    public void deleteMemberFromGroup(String ownerId, String groupName, String idToDelete) throws RequestedEntityNotFound {
+        Group group = getGroup(groupName, ownerId);
+        group.getUsers().removeIf((user) -> idToDelete.equals(user.getUserDetails().getUsername()));
         groupRepository.saveAndFlush(group);
     }
 
     @Override
-    public void updateGroupName(UpdateGroupNameDTO groupNameDTO, String userID) throws RequestedEntityNotFound {
-        Group group = getGroup(groupNameDTO.getOldName(), userID);
+    public void updateGroupName(String ownerId, String oldName, UpdateGroupNameDTO groupNameDTO) throws RequestedEntityNotFound {
+        Group group = getGroup(oldName, ownerId);
         group.setName(groupNameDTO.getNewName());
         groupRepository.saveAndFlush(group);
     }

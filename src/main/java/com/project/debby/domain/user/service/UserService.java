@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface UserService {
     User getUser(String externalID) throws RequestedEntityNotFound;
-    User registerUser(UserRegisterDTO registerDTO) throws UserAlreadyExistException;
-    void updateUsername(UsernameUpdateDTO updateDTO, String UserID) throws RequestedEntityNotFound;
+    void registerUser(UserRegisterDTO registerDTO) throws UserAlreadyExistException;
+    void updateUser(UpdateUserDTO updateDTO, String UserID) throws RequestedEntityNotFound, UserAlreadyExistException;
     User updateAvatar(MultipartFile file, String userID) throws RequestedEntityNotFound;
     void updateSettings(SettingsUpdateDTO updateDTO, String UserId) throws RequestedEntityNotFound;
     List<User> getByUsername(String username);
     User getByEmail(String email) throws RequestedEntityNotFound;
-    User updateExternalID(UpdateExternalID updateDTO, String userID) throws RequestedEntityNotFound, UserAlreadyExistException;
+    void updateExternalID(String updatedExternalId, String userID) throws RequestedEntityNotFound, UserAlreadyExistException;
 }

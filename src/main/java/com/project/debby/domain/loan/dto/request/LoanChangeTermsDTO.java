@@ -6,6 +6,5 @@ import java.time.LocalDateTime;
 
 @Data
 public class LoanChangeTermsDTO {
-    private Long stateID;
     private LocalDateTime newMaturityDate;
 }

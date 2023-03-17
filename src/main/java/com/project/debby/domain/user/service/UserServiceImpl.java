@@ -2,10 +2,7 @@ package com.project.debby.domain.user.service;
 
 import com.project.debby.domain.auth.service.ConfirmationService;
 import com.project.debby.domain.integrations.minio.service.MinioService;
-import com.project.debby.domain.user.dto.request.SettingsUpdateDTO;
-import com.project.debby.domain.user.dto.request.UpdateExternalID;
-import com.project.debby.domain.user.dto.request.UserRegisterDTO;
-import com.project.debby.domain.user.dto.request.UsernameUpdateDTO;
+import com.project.debby.domain.user.dto.request.*;
 import com.project.debby.domain.user.model.User;
 import com.project.debby.domain.user.model.repository.UserRepository;
 import com.project.debby.domain.user.service.exception.UserAlreadyExistException;
@@ -37,18 +34,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public synchronized User registerUser(UserRegisterDTO registerDTO) throws UserAlreadyExistException {
+    public synchronized void registerUser(UserRegisterDTO registerDTO) throws UserAlreadyExistException {
         Optional<User> checkUser = userRepository.findByUserDetails_Credentials_Email(registerDTO.getEmail());
         if (checkUser.isPresent()) throw new UserAlreadyExistException();
         User user = userFactory.create(registerDTO);
         confirmationService.sendConfirmation(registerDTO.getEmail(), user.getUserDetails().getUsername());
-        return userRepository.saveAndFlush(user);
+        userRepository.saveAndFlush(user);
     }
 
     @Override
-    public void updateUsername(UsernameUpdateDTO updateDTO, String userID) throws RequestedEntityNotFound {
+    public void updateUser(UpdateUserDTO updateDTO, String userID) throws RequestedEntityNotFound, UserAlreadyExistException {
         User user = getUser(userID);
-        user.setUsername(updateDTO.getNewUsername());
+        user.setUsername(updateDTO.getUsername());
+        if (updateDTO.getExternalId() != null
+                && !updateDTO.getExternalId().equals("")
+                && !user.getUserDetails().getCredentials().getExternalId().equals(updateDTO.getExternalId())){
+            updateExternalID(updateDTO.getExternalId(), user.getUserDetails().getCredentials().getExternalId());
+        }
         userRepository.saveAndFlush(user);
     }
 
@@ -79,12 +81,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public synchronized User updateExternalID(UpdateExternalID updateDTO, String userID) throws RequestedEntityNotFound, UserAlreadyExistException {
+    public synchronized void updateExternalID(String updatedExternalId, String userID) throws RequestedEntityNotFound, UserAlreadyExistException {
         Optional<User> checkUser = userRepository
-                .findByUserDetails_Credentials_ExternalId(updateDTO.getNewExternalID());
-        if (checkUser.isPresent()) throw new UserAlreadyExistException();
+                .findByUserDetails_Credentials_ExternalId(updatedExternalId);
+        if (checkUser.isPresent() || updatedExternalId.equals("me")) throw new UserAlreadyExistException();
         User user = getUser(userID);
-        user.getUserDetails().getCredentials().setExternalId(updateDTO.getNewExternalID());
-        return userRepository.saveAndFlush(user);
+        user.getUserDetails().getCredentials().setExternalId(updatedExternalId);
+        userRepository.saveAndFlush(user);
     }
 }

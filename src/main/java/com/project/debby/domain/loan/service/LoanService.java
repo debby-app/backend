@@ -17,10 +17,10 @@ public interface LoanService {
     Loan createLoan(LoanRegisterDTO registerDTO, String userID) throws RequestedEntityNotFound;
     void acceptLoan(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void declineLoan(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
-    void requestTermsChange(LoanChangeTermsDTO changeTermsDTO, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
+    void requestTermsChange(Long stateId, LoanChangeTermsDTO changeTermsDTO, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void acceptChangeTerms(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void declineChangeTerms(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
-    void requestPaidPartConfirmation(LoanPaidPartConfirmationDTO confirmationDTO, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
+    void requestPaidPartConfirmation(Long stateId, LoanPaidPartConfirmationDTO confirmationDTO, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void acceptPaidPart(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void declinePaidPart(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
     void requestClose(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException;
