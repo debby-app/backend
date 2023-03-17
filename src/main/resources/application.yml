@@ -4,9 +4,9 @@ spring:
       FAIL_ON_EMPTY_BEANS: false
     default-property-inclusion: non_null
   datasource:
-    url: jdbc:postgresql://10.0.0.23/debby-postgres
-    username: debby
-    password: debby-postgres-1
+    url: jdbc:postgresql://localhost/blps
+    username: blps
+    password: 12345
     driver-class-name: org.postgresql.Driver
   jpa:
     generate-ddl: true
@@ -18,11 +18,12 @@ spring:
 
 server:
   port: 8080
-  base-url: http://87.239.105.85:8080/
+  base-url: http://localhost:8080/
 
 springdoc:
   swagger-ui:
     path: /api.html
+
 
 jwt:
   secret-word: "WHAT_IF_ITS_JUST_A_DREAM"
@@ -30,11 +31,14 @@ jwt:
   access-token-lifetime:  3600000
 
 minio:
-  url: https://hb.bizmrg.com
-  access-key: tarGkfTHsTucwt1YNN5nAT
-  secret-key: fkzqiTK772Mw43QLNGpND7WKCd1Dq6pbvQ8dWtwDEDUv
+  url: http://localhost:9000
+  access-key: root
+  secret-key: rootroot
 
 mail:
   username: no-reply@plofin.com
   password: q99mrvNi0EQFa4iza2tD
   confirmation_hash_lifetime: 3600000
+logging:
+  level:
+    com.project.debby : DEBUG

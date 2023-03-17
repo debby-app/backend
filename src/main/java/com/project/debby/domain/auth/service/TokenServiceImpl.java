@@ -35,7 +35,9 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void deleteToken(String refreshToken) throws RequestedEntityNotFound {
         Token token = tokenRepository.getTokenByRefreshToken(refreshToken)
-                .orElseThrow(RequestedEntityNotFound::new);
+                .orElseThrow(
+                        () -> new RequestedEntityNotFound("Refresh token" + refreshToken + "not found")
+                );
         tokenRepository.deleteFromAssociation(token.getId());
         tokenRepository.delete(token);
     }
@@ -43,10 +45,10 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token refreshToken(String refreshToken) throws RequestedEntityNotFound {
         Token token = tokenRepository.getTokenByRefreshToken(refreshToken)
-                .orElseThrow(RequestedEntityNotFound::new);
+                .orElseThrow( () -> new RequestedEntityNotFound("Refresh token" + refreshToken + "not found"));
         String userID = jwtService.extractUserIdFromToken(refreshToken);
         UserDetails userDetails = userDetailsRepository.findByCredentials_ExternalId(userID)
-                .orElseThrow(RequestedEntityNotFound::new);
+                .orElseThrow( () -> new RequestedEntityNotFound("Refresh token" + refreshToken + "not found"));
         Token newToken = createToken(userDetails);
         token.setRefreshToken(newToken.getRefreshToken());
         token.setAccessToken(newToken.getAccessToken());

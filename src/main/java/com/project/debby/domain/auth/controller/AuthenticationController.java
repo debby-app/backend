@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
@@ -74,7 +76,7 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/confirm/{hash}")
+    @GetMapping("/confirm/{hash}")
     public ResponseEntity<TokenDTO> enableUser(@PathVariable String hash){
         log.info("Started: enabling user");
         UserDetails userDetails = confirmationService.checkConfirmation(hash);

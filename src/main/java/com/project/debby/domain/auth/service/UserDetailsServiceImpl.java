@@ -9,7 +9,6 @@ import com.project.debby.domain.auth.model.repository.UserDetailsRepository;
 import com.project.debby.domain.auth.service.exceptions.PasswordDoNotMatchesException;
 import com.project.debby.domain.user.dto.request.ChangeEmailDTO;
 import com.project.debby.domain.user.dto.request.PasswordUpdateDTO;
-import com.project.debby.domain.user.model.User;
 import com.project.debby.domain.user.service.exception.UserAlreadyExistException;
 import com.project.debby.util.exceptions.RequestedEntityNotFound;
 import lombok.RequiredArgsConstructor;
@@ -30,22 +29,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public void updatePassword(PasswordUpdateDTO passwordUpdateDTO, String UserID) throws RequestedEntityNotFound, PasswordDoNotMatchesException {
-        log.info("--changing password | user extId {}", UserID);
+        log.debug("--changing password | user extId {}", UserID);
         UserDetails userDetails = getByExternalID(UserID);
         if(passwordEncoder.matches(passwordUpdateDTO.getOldPassword(), userDetails.getPassword())){
             userDetails.getCredentials().setPassword(
                     passwordEncoder.encode(passwordUpdateDTO.getNewPassword()));
             userDetailsRepository.saveAndFlush(userDetails);
         }
-        else throw new PasswordDoNotMatchesException();
+        else throw new PasswordDoNotMatchesException("User password not math. Attempt to change password denied.");
     }
 
     @Override
     public void changeEmail(ChangeEmailDTO updateDTO, String UserID) throws RequestedEntityNotFound,
             UserAlreadyExistException {
         Optional<UserDetails> checkUser = userDetailsRepository.findByCredentials_Email(updateDTO.getNewEmail());
-        if (checkUser.isPresent()) throw new UserAlreadyExistException();
-        log.info("--updating email | user extId {}", UserID);
+        if (checkUser.isPresent()) throw new UserAlreadyExistException(
+                "Failed to change email of user " + UserID +
+                        ". User with email " + updateDTO.getNewEmail() + " already exists");
+        log.debug("--updating email | user extId {}", UserID);
         UserDetails userDetails = getByExternalID(UserID);
         userDetails.getCredentials().setEmail(updateDTO.getNewEmail());
         userDetails.setEnabled(false);
@@ -54,7 +55,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public void enableUser(String userID) throws RequestedEntityNotFound {
-        log.info("--enabling user | user extId {}", userID);
+        log.debug("--enabling user | user extId {}", userID);
         UserDetails userDetails = getByExternalID(userID);
         userDetails.setEnabled(true);
         userDetailsRepository.saveAndFlush(userDetails);
@@ -62,10 +63,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails signIn(LoginDTO loginDTO) throws RequestedEntityNotFound, PasswordDoNotMatchesException {
-        log.info("--signing in | user email {}", loginDTO.getEmail());
+        log.debug("--signing in | user email {}", loginDTO.getEmail());
         UserDetails user = userDetailsRepository.findByCredentials_Email(loginDTO.getEmail())
-                .orElseThrow(RequestedEntityNotFound::new);
-        log.info("--checking user| user email {}", loginDTO.getEmail());
+                .orElseThrow(
+                        () -> new RequestedEntityNotFound("UserDetails with email " + loginDTO.getEmail() + "not found"
+                        ));
+        log.debug("--checking user| user email {}", loginDTO.getEmail());
         if (!user.isEnabled()){
             throw new UserDisabledException("User with email extracted from token is currently disabled.");
         }
@@ -75,9 +78,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (!user.isAccountNonLocked()){
             throw new UserLockedException("User with email extracted from token is currently locked.");
         }
-        log.info("--checking password | user email {}", loginDTO.getEmail());
+        log.debug("--checking password | user email {}", loginDTO.getEmail());
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getCredentials().getPassword())){
-            throw new PasswordDoNotMatchesException();
+            throw new PasswordDoNotMatchesException("User password not math. Attempt to sign-in denied.");
         }
         return user;
     }
@@ -89,6 +92,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private UserDetails getByExternalID(String externalID) throws RequestedEntityNotFound {
-        return userDetailsRepository.findByCredentials_ExternalId(externalID).orElseThrow(RequestedEntityNotFound::new);
+        return userDetailsRepository.findByCredentials_ExternalId(externalID).orElseThrow(
+                () -> new RequestedEntityNotFound("UserDetails with extId " + externalID + "not found"));
     }
 }

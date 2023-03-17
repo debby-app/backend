@@ -30,13 +30,15 @@ public class UserServiceImpl implements UserService {
     public User getUser(String externalID) throws RequestedEntityNotFound {
         log.info(externalID);
         return userRepository.findByUserDetails_Credentials_ExternalId(externalID)
-                .orElseThrow(RequestedEntityNotFound::new);
+                .orElseThrow(() -> new RequestedEntityNotFound("User with extId" + externalID + " not found"));
     }
 
     @Override
     public synchronized void registerUser(UserRegisterDTO registerDTO) throws UserAlreadyExistException {
+        log.debug("--creating new user | email {}", registerDTO.getEmail());
         Optional<User> checkUser = userRepository.findByUserDetails_Credentials_Email(registerDTO.getEmail());
-        if (checkUser.isPresent()) throw new UserAlreadyExistException();
+        if (checkUser.isPresent()) throw new UserAlreadyExistException("User with email " +
+                registerDTO.getEmail() + " already exist.");
         User user = userFactory.create(registerDTO);
         confirmationService.sendConfirmation(registerDTO.getEmail(), user.getUserDetails().getUsername());
         userRepository.saveAndFlush(user);
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UpdateUserDTO updateDTO, String userID) throws RequestedEntityNotFound, UserAlreadyExistException {
+        log.debug("--updating user | user extId {}", userID);
         User user = getUser(userID);
         user.setUsername(updateDTO.getUsername());
         if (updateDTO.getExternalId() != null
@@ -56,6 +59,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateAvatar(MultipartFile file, String userID) throws RequestedEntityNotFound {
+        log.debug("--updating user avatar | user extId {}", userID);
         User user = getUser(userID);
         user.setAvatar(minioService.saveUserAvatar(user, file));
         return userRepository.saveAndFlush(user);
@@ -63,6 +67,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateSettings(SettingsUpdateDTO updateDTO, String userID) throws RequestedEntityNotFound {
+        log.debug("--updating user settings | user extId {}", userID);
         User user = getUser(userID);
         user.getSettings().setEmailNotificationEnabled(updateDTO.isEmailNotificationEnabled());
         user.getSettings().setPushNotificationEnabled(updateDTO.isPushNotificationEnabled());
@@ -77,14 +82,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByEmail(String email) throws RequestedEntityNotFound {
         return userRepository.findByUserDetails_Credentials_Email(email)
-                .orElseThrow(RequestedEntityNotFound::new);
+                .orElseThrow(() -> new RequestedEntityNotFound("User with email " + email + " not found"));
     }
 
     @Override
     public synchronized void updateExternalID(String updatedExternalId, String userID) throws RequestedEntityNotFound, UserAlreadyExistException {
+        log.debug("--updating user externalId | user extId {}, new Id {}", userID, updatedExternalId);
         Optional<User> checkUser = userRepository
                 .findByUserDetails_Credentials_ExternalId(updatedExternalId);
-        if (checkUser.isPresent() || updatedExternalId.equals("me")) throw new UserAlreadyExistException();
+        if (checkUser.isPresent() || updatedExternalId.equals("me"))
+            throw new UserAlreadyExistException("External id change failed. User with extId" +
+                    updatedExternalId + " already exist");
         User user = getUser(userID);
         user.getUserDetails().getCredentials().setExternalId(updatedExternalId);
         userRepository.saveAndFlush(user);

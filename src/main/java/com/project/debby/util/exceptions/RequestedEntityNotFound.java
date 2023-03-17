@@ -5,4 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class RequestedEntityNotFound extends Throwable{
+
+    public RequestedEntityNotFound(String msg){
+        super(msg);
+    }
 }

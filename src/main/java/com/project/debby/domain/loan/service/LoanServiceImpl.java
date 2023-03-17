@@ -45,6 +45,7 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Loan createLoan(LoanRegisterDTO registerDTO, String userID) throws RequestedEntityNotFound {
+        log.debug("--creating loan | user extId {}", userID);
         User owner = userService.getUser(userID);
         Loan loan = loanFactory.create(registerDTO, owner);
         for (String v : registerDTO.getUsers()) {
@@ -63,75 +64,87 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public void acceptLoan(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException {
+        log.debug("--accepting loan | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setStatus(LoanStatus.ACTIVE);
             notificationService.notify(state.getLoan().getOwner(), NotificationType.LOAN_ACCEPTED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to accept loan " + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void declineLoan(Long stateID, String userID) throws RequestedEntityNotFound, NotEnoughPermissionsException {
+        log.debug("--declining loan | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setStatus(LoanStatus.DECLINED);
             notificationService.notify(state.getLoan().getOwner(), NotificationType.LOAN_DECLINED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to decline loan " + stateID +
+                " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void requestTermsChange(Long stateId, LoanChangeTermsDTO changeTermsDTO, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--requesting change of terms | user extId {} state {}", userID, stateId);
         LoanState state = getLoanState(stateId, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setRequestedMaturityDate(changeTermsDTO.getNewMaturityDate());
             state.setStatus(LoanStatus.CHANGED);
             notificationService.notify(state.getLoan().getOwner(), NotificationType.TERMS_CHANGE_REQUEST, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to request change of terms of loan " +
+                stateId + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void acceptChangeTerms(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--accepting change of terms | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             state.setUpdatedMaturityDate(state.getRequestedMaturityDate());
             state.setStatus(LoanStatus.ACTIVE);
             notificationService.notify(state.getBorrower(), NotificationType.TERMS_CHANGE_ACCEPTED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to accept change of terms of loan " +
+                stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void declineChangeTerms(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--declining change of terms | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             state.setRequestedMaturityDate(state.getUpdatedMaturityDate());
             state.setStatus(LoanStatus.ACTIVE);
             notificationService.notify(state.getBorrower(), NotificationType.TERMS_CHANGE_DECLINED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to decline change of terms of loan "
+                + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void requestPaidPartConfirmation(Long stateId, LoanPaidPartConfirmationDTO confirmationDTO, String userID)
             throws RequestedEntityNotFound, NotEnoughPermissionsException {
+        log.debug("--requesting paid paid confirmation | user extId {} state {}", userID, stateId);
         LoanState state = getLoanState(stateId, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setPaidPartOnConfirmation(confirmationDTO.getPaidPart());
             state.setStatus(LoanStatus.PENDING_PAID_PART_ACCEPTANCE);
             notificationService.notify(state.getLoan().getOwner(), NotificationType.PAID_PART_REQUEST, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to request paid part confirmation of loan "
+                + stateId + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void acceptPaidPart(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--accepting paid paid | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             state.setPaidPart(state.getPaidPartOnConfirmation());
@@ -143,62 +156,73 @@ public class LoanServiceImpl implements LoanService {
                 state.setStatus(LoanStatus.ARCHIVED);
                 notificationService.notify(state.getBorrower(), NotificationType.CLOSE_ACCEPTED, state);
             } else state.setStatus(LoanStatus.ACTIVE);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to accept paid part confirmation of loan "
+                + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void declinePaidPart(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--declining paid paid | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             state.setPaidPartOnConfirmation(BigDecimal.ZERO);
             state.setStatus(LoanStatus.ACTIVE);
             notificationService.notify(state.getBorrower(), NotificationType.PAID_PART_DECLINED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to decline paid part confirmation of loan "
+                + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void requestClose(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--requesting close of loan | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getBorrower().getUserDetails().getUsername().equals(userID)){
             state.setStatus(LoanStatus.PENDING_CLOSE);
             notificationService.notify(state.getLoan().getOwner(), NotificationType.CLOSE_REQUEST, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to request close of loan "
+                + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void acceptClose(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--accepting close of loan | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             state.setStatus(LoanStatus.ARCHIVED);
             notificationService.notify(state.getBorrower(), NotificationType.CLOSE_ACCEPTED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to accept close of loan "
+                + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public void declineClose(Long stateID, String userID) throws RequestedEntityNotFound,
             NotEnoughPermissionsException {
+        log.debug("--declining close of loan | user extId {} state {}", userID, stateID);
         LoanState state = getLoanState(stateID, userID);
         if (state.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             state.setStatus(LoanStatus.ACTIVE);
             notificationService.notify(state.getBorrower(), NotificationType.CLOSE_DECLINED, state);
-        } else throw new NotEnoughPermissionsException();
+        } else throw new NotEnoughPermissionsException(userID + " attempted to decline close of loan "
+                + stateID + " that not related to him.");
         loanStateRepository.saveAndFlush(state);
     }
 
     @Override
     public Loan getLoan(Long id, String userID) throws RequestedEntityNotFound {
-        Loan loan = loanRepository.findById(id).orElseThrow(RequestedEntityNotFound::new);
+        Loan loan = loanRepository.findById(id).orElseThrow(
+                () -> new RequestedEntityNotFound("Loan with id " + id + " not found.")
+        );
         if (loan.getOwner().getUserDetails().getUsername().equals(userID)){
             return loan;
         }
-        else throw new RequestedEntityNotFound();
+        else throw new RequestedEntityNotFound("Loan with id " + id + " not related to user " + userID);
     }
 
     @Override
@@ -212,7 +236,9 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public String uploadImage(String userId, MultipartFile file, Long stateId) throws RequestedEntityNotFound, NotEnoughPermissionsException, CannotRemoveObjectMinioException {
+    public String uploadImage(String userId, MultipartFile file, Long stateId) throws RequestedEntityNotFound,
+            NotEnoughPermissionsException, CannotRemoveObjectMinioException {
+        log.debug("--uploading image to loan | user extId {} state {}", userId, stateId);
         User user = userService.getUser(userId);
         LoanState state = getLoanState(stateId, userId);
         if(state.getBorrower().getId().equals(user.getId())){
@@ -222,7 +248,8 @@ public class LoanServiceImpl implements LoanService {
             state.setFile(minioService.saveImage(state, file));
             loanStateRepository.saveAndFlush(state);
             return minioService.getImageURL(state);
-        }else throw new NotEnoughPermissionsException();
+        }else throw new NotEnoughPermissionsException(userId + " attempted to upload image for loan "
+                + stateId + " that not related to him.");
     }
 
     @Override
@@ -238,11 +265,13 @@ public class LoanServiceImpl implements LoanService {
     }
 
     public LoanState getLoanState(Long id, String userID) throws RequestedEntityNotFound {
-        LoanState loanState = loanStateRepository.findById(id).orElseThrow(RequestedEntityNotFound::new);
+        LoanState loanState = loanStateRepository.findById(id).orElseThrow(
+                () -> new RequestedEntityNotFound("Loan state with id " + id + "not found")
+        );
         if (loanState.getBorrower().getUserDetails().getUsername().equals(userID)
         || loanState.getLoan().getOwner().getUserDetails().getUsername().equals(userID)){
             return loanState;
         }
-        else throw new RequestedEntityNotFound();
+        else throw new RequestedEntityNotFound("Loan state with id " + id + "not related to user " + userID);
     }
 }

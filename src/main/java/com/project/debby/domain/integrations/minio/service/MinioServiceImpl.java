@@ -40,11 +40,11 @@ public class MinioServiceImpl implements MinioService {
     public String getAvatarURL(User user) {
         var avatar = user.getAvatar();
         if (avatar == null) {
-            log.info("User {} don't have avatar", user.getUsername());
+            log.debug("User {} don't have avatar", user.getUsername());
             return "";
         }
         try {
-            log.info("Start getting avatar link for user {}", user.getUsername());
+            log.debug("Start getting avatar link for user {}", user.getUsername());
             return clientEx.getFileURL(GetFileURLMinioDTO.create(avatar));
         } catch (Exception e) {
             log.error("Cannot get avatar for user {}, reason {}", user.getUsername(), e.getMessage());
@@ -54,7 +54,7 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public File saveUserAvatar(User user, MultipartFile avatarFile) {
-        log.info("Start create new avatar for user {}", user.getUsername());
+        log.debug("Start create new avatar for user {}", user.getUsername());
         var avatar = avatarFactory.create(user);
 
         try {
@@ -70,7 +70,7 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public File saveImage(LoanState state, MultipartFile file) {
-        log.info("Start create new image {}", file.getOriginalFilename());
+        log.debug("Start create new image {}", file.getOriginalFilename());
         var filed = fileFactory.create(state);
         try {
             clientEx.saveFile(
@@ -86,7 +86,7 @@ public class MinioServiceImpl implements MinioService {
     @Override
     public String getImageURL(LoanState state) {
         try {
-            log.info("Start getting image link for loan state {}", state.getId());
+            log.debug("Start getting image link for loan state {}", state.getId());
             return clientEx.getFileURL(GetFileURLMinioDTO.create(state.getFile()));
         } catch (Exception e) {
             log.error("Cannot get avatar for loan state {}, reason {}", state.getId(), e.getMessage());
@@ -96,7 +96,7 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public void removeImage(LoanState state) throws CannotRemoveObjectMinioException {
-        log.info("Start delete image for state {}", state.getId());
+        log.debug("Start delete image for state {}", state.getId());
         var filed = fileFactory.create(state);
         try {
             clientEx.deleteFile(GetFileURLMinioDTO.create(filed));

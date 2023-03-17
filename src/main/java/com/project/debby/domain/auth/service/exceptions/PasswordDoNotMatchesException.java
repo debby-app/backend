@@ -5,4 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class PasswordDoNotMatchesException extends Throwable{
+
+    public PasswordDoNotMatchesException(String msg){
+        super(msg);
+    }
 }

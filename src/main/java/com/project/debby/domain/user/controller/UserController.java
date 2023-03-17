@@ -64,7 +64,8 @@ public class  UserController {
 
     @SneakyThrows
     @GetMapping("/{id}")
-    public ResponseEntity<UserWithAvatarDTO> getUser(@PathVariable String id){
+    public ResponseEntity<UserWithAvatarDTO> getUser(@PathVariable String id, HttpServletRequest request){
+        if (id.equals("me")) id = ExternalIdExtractor.getExternalID(request);
         log.info("Started: select user | user extId {} ", id);
         User user = userService.getUser(id);
         log.info("Complete: select user | user extId {} ", id);
@@ -80,7 +81,7 @@ public class  UserController {
     }
 
     @SneakyThrows
-    @GetMapping
+    @GetMapping("/by-email")
     public ResponseEntity<UserWithAvatarDTO> getByEmail(@RequestParam String email){
         log.info("Started: selecting by email {}", email);
         User user = userService.getByEmail(email);
@@ -88,7 +89,7 @@ public class  UserController {
     }
 
     @SneakyThrows
-    @GetMapping
+    @GetMapping("/by-username")
     public ResponseEntity<List<UserWithAvatarDTO>> getByUsername(@RequestParam("username") String username){
         log.info("Started: selecting by username {}", username);
         List<User> users = userService.getByUsername(username);

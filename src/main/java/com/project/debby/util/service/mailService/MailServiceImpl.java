@@ -29,7 +29,7 @@ public class MailServiceImpl implements MailService {
         message.setTo(destinationEmail);
         message.setSubject(subject);
         message.setText(text);
-        log.info("--sending message | destinationEmail {}", destinationEmail);
+        log.debug("--sending message | destinationEmail {}", destinationEmail);
         mailThreadPool.submit(() -> {
             try {
                 mailSender.send(message);

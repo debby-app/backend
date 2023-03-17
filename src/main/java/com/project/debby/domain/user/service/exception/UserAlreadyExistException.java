@@ -5,4 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class UserAlreadyExistException extends Throwable {
+
+    public UserAlreadyExistException(String msg){
+        super(msg);
+    }
 }

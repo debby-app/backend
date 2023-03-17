@@ -65,9 +65,58 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .authorizeRequests()
-                .antMatchers("/api.html", "/swagger-ui/*", "/v3/api-docs", "/user/sign-in", "/user/sign-up", "/user/confirm/*").permitAll()
-                .antMatchers(HttpMethod.PUT, "/users/").hasAuthority("ADMIN")
-                .anyRequest().authenticated();
+
+                //Swagger UI
+
+                .antMatchers("/api.html",
+                        "/swagger-ui/*",
+                        "/v3/api-docs")
+                .permitAll()
+
+                // User controller
+                .antMatchers(HttpMethod.GET,
+                        "/users",
+                        "/users/{id}")
+                .permitAll()
+                .antMatchers(HttpMethod.POST,
+                        "/users/sign-up")
+                .permitAll()
+                .antMatchers(HttpMethod.GET,
+                        "/users/{id}/notification")
+                .hasAnyAuthority("user", "admin")
+                .antMatchers(HttpMethod.PUT,
+                        "/users/{id}",
+                                "/users/{id}/avatar")
+                .hasAnyAuthority("user", "admin")
+
+                // Auth Controller
+
+                .antMatchers(HttpMethod.POST,
+                        "/auth/confirm/*",
+                        "/auth/sign-in",
+                        "/auth/refresh")
+                .permitAll()
+
+                .antMatchers(HttpMethod.POST,
+                        "/auth/logout")
+                .hasAnyAuthority("user", "admin")
+
+                .antMatchers(HttpMethod.PUT,
+                        "/auth/{id}/email",
+                        "/auth/{id}/password")
+                .hasAnyAuthority("user", "admin")
+
+                // Group Controller
+
+                .antMatchers("/{id}/groups/**")
+                .hasAnyAuthority("user", "admin")
+
+                // Loan Controller
+
+                .antMatchers("/loans/**")
+                .hasAnyAuthority("user", "admin")
+
+                .anyRequest().hasAuthority("admin");
     }
 
     @Bean

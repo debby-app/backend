@@ -33,7 +33,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         ConfirmationMail link = createConfirmationMail(userID);
         String subject = "Confirmation Link";
         String text = "To verify this email and activate your account" +
-                " please follow this confirmation link " + baseURL + "users/confirm/"
+                " please follow this confirmation link " + baseURL + "auth/confirm/"
                 + link.getHash();
         log.info("--sending confirmation mail | user extId {}", userID);
         mailService.sendMail(email, subject, text);
