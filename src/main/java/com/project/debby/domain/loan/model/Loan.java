@@ -1,6 +1,5 @@
 package com.project.debby.domain.loan.model;
 
-import com.project.debby.domain.integrations.minio.model.entity.File;
 import com.project.debby.domain.user.model.User;
 import lombok.*;
 

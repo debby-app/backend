@@ -32,7 +32,7 @@ public class MinioServiceImpl implements MinioService {
     @SneakyThrows
     public void initDefaultBucket() {
         if (!clientEx.checkBucketExist(MinioConstants.PROFILE_AVATAR_BUCKET_NAME)) {
-            clientEx.createBucket(MinioConstants.PROFILE_AVATAR_BUCKET_NAME); // hm, maybe find best logic?
+            clientEx.createBucket(MinioConstants.PROFILE_AVATAR_BUCKET_NAME);
         }
     }
 

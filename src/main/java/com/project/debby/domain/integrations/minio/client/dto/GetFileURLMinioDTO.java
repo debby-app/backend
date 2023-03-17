@@ -9,9 +9,6 @@ public class GetFileURLMinioDTO {
     String filePath;
     String fileName;
 
-    private GetFileURLMinioDTO() {
-    }
-
     private GetFileURLMinioDTO(String bucketName, String filePath, String fileName) {
         this.bucketName = bucketName;
         this.filePath = filePath;

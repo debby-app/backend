@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> getAllByUser_UserDetails_Credentials_ExternalId(String externalID);
-    List<Notification> getAllByCorrelatedLoanState(LoanState state);
 }

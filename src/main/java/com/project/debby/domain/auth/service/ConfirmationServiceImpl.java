@@ -29,7 +29,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     private final MailService mailService;
 
     @Override
-    public ConfirmationMail sendConfirmation(String email, String userID) {
+    public void sendConfirmation(String email, String userID) {
         ConfirmationMail link = createConfirmationMail(userID);
         String subject = "Confirmation Link";
         String text = "To verify this email and activate your account" +
@@ -37,7 +37,6 @@ public class ConfirmationServiceImpl implements ConfirmationService {
                 + link.getHash();
         log.info("--sending confirmation mail | user extId {}", userID);
         mailService.sendMail(email, subject, text);
-        return link;
     }
 
     public ConfirmationMail createConfirmationMail(String userID) {

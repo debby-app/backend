@@ -12,7 +12,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ public class GroupController {
     }
 
     @SneakyThrows
-    @PostMapping("/{name}/add/{idToAdd}")
+    @PostMapping("/{name}/{idToAdd}")
     public ResponseEntity<Void> addMemberToGroup(@PathVariable String id, @PathVariable String name,
                                                  @PathVariable String idToAdd,
                                                 HttpServletRequest request){
@@ -60,7 +59,7 @@ public class GroupController {
     }
 
     @SneakyThrows
-    @DeleteMapping("/{name}/delete/{idToDelete}")
+    @DeleteMapping("/{name}/{idToDelete}")
     public ResponseEntity<Void> deleteMemberFromGroup(@PathVariable String id, @PathVariable String name,
                                                       @PathVariable String idToDelete,
                                                 HttpServletRequest request){

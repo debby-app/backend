@@ -1,6 +1,5 @@
 package com.project.debby.domain.loan.dto.response;
 
-import com.project.debby.domain.integrations.minio.service.MinioService;
 import com.project.debby.domain.loan.model.Loan;
 import com.project.debby.domain.user.dto.response.UserDTO;
 import lombok.Builder;

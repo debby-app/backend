@@ -14,9 +14,6 @@ public class UploadFileMinioDTO {
     private String mimeType;
     private InputStream file;
 
-    private UploadFileMinioDTO() {
-    }
-
     private UploadFileMinioDTO(String bucketName, String filePath, UUID fileName, String mimeType, InputStream file) {
         this.bucketName = bucketName;
         this.filePath = filePath;
