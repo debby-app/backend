@@ -22,6 +22,6 @@ public class Group {
     private String name;
     @OneToOne(fetch = FetchType.EAGER)
     private User owner;
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> users;
 }

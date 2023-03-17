@@ -69,8 +69,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Swagger UI
 
                 .antMatchers("/api.html",
-                        "/swagger-ui/*",
-                        "/v3/api-docs")
+                        "/swagger-ui/**",
+                        "/v3/**")
                 .permitAll()
 
                 // User controller
@@ -91,8 +91,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // Auth Controller
 
+                .antMatchers(HttpMethod.GET,
+                        "/auth/confirm/*")
+                .permitAll()
                 .antMatchers(HttpMethod.POST,
-                        "/auth/confirm/*",
                         "/auth/sign-in",
                         "/auth/refresh")
                 .permitAll()
