@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getByUsername(String username) {
-        return userRepository.getAllByUsernameStartsWith(username);
+        return userRepository.getAllByUsernameContains(username);
     }
 
     @Override

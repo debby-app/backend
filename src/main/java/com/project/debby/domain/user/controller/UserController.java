@@ -171,7 +171,7 @@ public class  UserController {
 
     @SneakyThrows
     @GetMapping("/get/by-username")
-    public ResponseEntity<List<UserWithAvatarDTO>> getByUsername(@RequestParam String username){
+    public ResponseEntity<List<UserWithAvatarDTO>> getByUsername(@RequestParam("username") String username){
         log.info("Started: selecting by username {}", username);
         List<User> users = userService.getByUsername(username);
         return ResponseEntity.ok(users.stream()

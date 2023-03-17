@@ -34,7 +34,7 @@ public class LoanState {
     private LocalDateTime updatedMaturityDate;
     private LocalDateTime requestedMaturityDate;
     private BigDecimal paidPart;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private File file;
     private BigDecimal paidPartOnConfirmation;
 

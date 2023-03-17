@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserDetails_Credentials_ExternalId(String userID);
     Optional<User> findByUserDetails_Credentials_Email(String email);
-    List<User> getAllByUsernameStartsWith(String username);
+    List<User> getAllByUsernameContains(String username);
 }
